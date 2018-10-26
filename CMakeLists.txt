@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 2.8)
+project( imgProcess )
+find_package( OpenCV REQUIRED )
+add_executable( imgProcess imgProcess.cpp )
+target_link_libraries( imgProcess ${OpenCV_LIBS} )
