@@ -1,10 +1,39 @@
 #include <cstdio>
 #include <cstdlib>
+#include <opencv2/opencv.hpp>
 
-class image {
+#include "imgProcess.hpp"
+
+using namespace cv;
+
+class pixel {
 
 }
 
-int main(void) {
+class image {
+    // This will be populated with our image object 
+    // img[x][y] = our 2-D array of pixels
+}
+
+int main(int argc, char** argv) {
+
+    if (argc != 2){
+        printf("usage: DisplayImage.out <Image_Path>\n");
+        return -1;
+        )
+
+        Mat image;
+        image = imread(argv[1], 1);
+
+        if (!image.data) {
+            printf("No image data\n");
+            return -1;
+        }
+        namedWindow("Display image", WINDOW_AUTOSIZE);
+        imshow("Display Image", image);
+
+        waitKey(0);
+        return 0;
+    }
   
 }
