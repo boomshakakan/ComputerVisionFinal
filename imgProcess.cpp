@@ -19,11 +19,18 @@ class image {
 
 int main(int argc, char** argv) {
 
+    /*
     if (argc != 2){
         printf("Usage: ./imgProcess <Image_Path>\n");
         return -1;
     }
+    */
 
+        pixel pix = new pixel();
+        pix.getIntensity();
+        
+
+        /*
         Mat image;
         image = imread(argv[1], 1);
 
@@ -36,4 +43,5 @@ int main(int argc, char** argv) {
 
         waitKey(0);
         return 0;
+        */
     }

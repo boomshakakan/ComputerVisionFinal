@@ -1,12 +1,73 @@
 #ifndef IMGPROCESS_H
 #define IMGPROCESS_H
 
-class pixel {
+#include <cstdio>
+#include <iostream>
 
+using namespace std;
+
+class pixel { 
+    private:
+    // an image object (defined below) will contain a 2-D array of pixels (defined here)
+    // pixel will also hold values such as PIXEL INTENSITY, ... ?
+    // VARIABLES
+    int intensity; // range of 0-255
+    int x, y;
+
+    public:
+    // constructor for pixel object with no input parameters
+    pixel() {
+        cout << "Default pixel constructor called" << endl;
+        intensity = 0;
+    }
+
+    // constructor for pixel object with an input for the pixel intensity 
+    pixel(int newIntensity) {
+        cout << "Constructor called... intensity set" << endl;
+        intensity = newIntensity;
+    }
+
+    pixel(int newIntensity, int c, int r) {
+        cout << "Constructor called... intensity & coordinates set" << endl;
+        intensity = newIntensity;
+        x = c;
+        y = r;
+    }
+
+    // destructor for pixel object 
+    ~pixel() {
+        cout << "Destructor called for pixel" << endl;
+        // DESTROY (more important for image object)
+    }
+
+    // MEMBER FUNCTIONS
+    void printIntensity() {
+        cout << intensity << endl;
+    }
+
+    // GETTER AND SETTER FUNCTION FOR OUR PIXEL'S INTENSITY
+    int getIntensity() {
+        return intensity;
+    }
+
+    void setIntensity(int newIntensity) {
+        intensity = newIntensity;
+    }
 };
 
-class image {
+class image { 
+    private:
+    // This will be populated with our image object -> img[x][y] = our 2-D array of pixels
+    // VARIABLES
+    // an example of how we would create our image object creating an array of pixel objects
+    pixel arr[10][10];
 
+    public:
+    // MEMBER FUNCTIONS
+    
 };
+
+// we will use constructors and a nested for loop in order to initialize an array of pixels
+// to give to our image object 
 
 #endif
