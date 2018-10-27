@@ -4,7 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/Users/mattstevenson/Desktop/ECE415/FinalProject/ComputerVisionFinal/imgProcess.cpp" "/Users/mattstevenson/Desktop/ECE415/FinalProject/ComputerVisionFinal/CMakeFiles/imgProcess.dir/imgProcess.cpp.o"
+  "/Users/mattstevenson/Desktop/ComputerVisionFinal/ComputerVisionFinal/imgProcess.cpp" "/Users/mattstevenson/Desktop/ComputerVisionFinal/ComputerVisionFinal/CMakeFiles/imgProcess.dir/imgProcess.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "Clang")
 

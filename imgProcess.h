@@ -1,5 +1,7 @@
 #ifndef IMGPROCESS_H
 #define IMGPROCESS_H
+#define imgProcess_VERSION_MAJOR @imgProcess_VERSION_MAJOR@
+#define imgProcess_VERSION_MINOR @imgProcess_VERSION_MINOR@
 
 #include <cstdio>
 #include <iostream>
@@ -15,13 +17,12 @@ class pixel {
     int x, y;
 
     public:
-    // constructor for pixel object with no input parameters
+    // CONSTRUCTORS
     pixel() {
         cout << "Default pixel constructor called" << endl;
         intensity = 0;
     }
 
-    // constructor for pixel object with an input for the pixel intensity 
     pixel(int newIntensity) {
         cout << "Constructor called... intensity set" << endl;
         intensity = newIntensity;
@@ -60,9 +61,14 @@ class image {
     // This will be populated with our image object -> img[x][y] = our 2-D array of pixels
     // VARIABLES
     // an example of how we would create our image object creating an array of pixel objects
+    int r, c;
     pixel arr[10][10];
 
     public:
+    // CONSTRUCTORS 
+    image() {
+        cout << "Default image constructor called" << endl;
+    }
     // MEMBER FUNCTIONS
     
 };

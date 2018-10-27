@@ -1,47 +1,35 @@
 #include <cstdio>
 #include <cstdlib>
+#include <iostream>
 #include <opencv2/opencv.hpp>
 #include "imgProcess.h"
 
 using namespace cv;
-
-/*
-// CLASSES DEFINED IN HEADER FILE
-class pixel {
-
-}
-
-class image {
-    // This will be populated with our image object 
-    // img[x][y] = our 2-D array of pixels
-}
-*/
+using namespace std;
 
 int main(int argc, char** argv) {
 
-    /*
-    if (argc != 2){
+    
+    if (argc != 2) {
         printf("Usage: ./imgProcess <Image_Path>\n");
         return -1;
     }
-    */
+    
+    // CLASSES INITIALIZED IN .h ARE WORKING CORRECTLY
+    // pixel *pix = new pixel();
+    // cout << pix->getIntensity() << endl;;
 
-        pixel pix = new pixel();
-        pix.getIntensity();
-        
+    image *img = new image();
 
-        /*
-        Mat image;
-        image = imread(argv[1], 1);
+    Mat image;
+    image = imread(argv[1], 1);
 
-        if (!image.data) {
-            printf("No image data\n");
-            return -1;
-        }
-        namedWindow("Display image", WINDOW_NORMAL);
-        imshow("Display Image", image);
-
-        waitKey(0);
-        return 0;
-        */
+    if (!image.data) {
+        printf("No image data\n");
+        return -1;
     }
+    namedWindow("Display image", WINDOW_NORMAL);
+    imshow("Display Image", image);
+
+    return 0;
+}

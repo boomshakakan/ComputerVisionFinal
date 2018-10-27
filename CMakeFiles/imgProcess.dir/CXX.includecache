@@ -6,17 +6,23 @@
 
 #IncludeRegexTransform: 
 
-/Users/mattstevenson/Desktop/ECE415/FinalProject/ComputerVisionFinal/imgProcess.cpp
+/Users/mattstevenson/Desktop/ComputerVisionFinal/ComputerVisionFinal/imgProcess.cpp
 cstdio
 -
 cstdlib
 -
+iostream
+-
 opencv2/opencv.hpp
 -
 imgProcess.h
-/Users/mattstevenson/Desktop/ECE415/FinalProject/ComputerVisionFinal/imgProcess.h
+/Users/mattstevenson/Desktop/ComputerVisionFinal/ComputerVisionFinal/imgProcess.h
 
-/Users/mattstevenson/Desktop/ECE415/FinalProject/ComputerVisionFinal/imgProcess.h
+/Users/mattstevenson/Desktop/ComputerVisionFinal/ComputerVisionFinal/imgProcess.h
+cstdio
+-
+iostream
+-
 
 /usr/local/include/boost/assert.hpp
 boost/config.hpp
