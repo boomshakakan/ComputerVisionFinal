@@ -62,12 +62,20 @@ class image {
     // VARIABLES
     // an example of how we would create our image object creating an array of pixel objects
     int r, c;
-    pixel arr[10][10];
 
     public:
     // CONSTRUCTORS 
     image() {
         cout << "Default image constructor called" << endl;
+    }
+
+    image(int x, int y) {
+        cout << "Constructor called with given row and column size" << endl;
+        pixel arr[x][y];
+    }
+    
+    ~image() {
+
     }
     // MEMBER FUNCTIONS
     

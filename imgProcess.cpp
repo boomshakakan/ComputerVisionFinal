@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
+#include <array>
 #include <opencv2/opencv.hpp>
 #include "imgProcess.h"
 
@@ -15,11 +16,11 @@ int main(int argc, char** argv) {
         return -1;
     }
     
-    // CLASSES INITIALIZED IN .h ARE WORKING CORRECTLY
+    // OBJECT INITIALIZATIONS ARE WORKING CORRECTLY
     // pixel *pix = new pixel();
-    // cout << pix->getIntensity() << endl;;
+    // cout << pix->getIntensity() << endl;
 
-    image *img = new image();
+    // image *img = new image;
 
     Mat image;
     image = imread(argv[1], 1);
@@ -31,5 +32,6 @@ int main(int argc, char** argv) {
     namedWindow("Display image", WINDOW_NORMAL);
     imshow("Display Image", image);
 
+    waitKey(0);
     return 0;
 }

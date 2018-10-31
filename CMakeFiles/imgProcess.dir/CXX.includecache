@@ -13,6 +13,8 @@ cstdlib
 -
 iostream
 -
+array
+-
 opencv2/opencv.hpp
 -
 imgProcess.h
