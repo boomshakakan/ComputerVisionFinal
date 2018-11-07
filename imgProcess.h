@@ -46,13 +46,34 @@ class pixel {
         cout << intensity << endl;
     }
 
-    // GETTER AND SETTER FUNCTION FOR OUR PIXEL'S INTENSITY
+    // GETTER AND SETTER FUNCTION FOR OUR PIXEL'S INTENSITY & OUR PIXEL COORDINATES
     int getIntensity() {
         return intensity;
     }
 
     void setIntensity(int newIntensity) {
         intensity = newIntensity;
+    }
+
+    int getRow() {
+        return x;
+    }
+
+    int getCol() {
+        return y;
+    }
+
+    void setRow(int newRow) {
+        x = newRow;
+    }
+
+    void setCol(int newCol) {
+        y = newCol;
+    }
+
+    void setCoor(int newRow, int newCol) {
+        x = newRow;
+        y = newCol;
     }
 };
 
@@ -61,6 +82,7 @@ class image {
     // This will be populated with our image object -> img[x][y] = our 2-D array of pixels
     // VARIABLES
     // an example of how we would create our image object creating an array of pixel objects
+    // THE VARIABLES r & c WILL BE THE BOUNDARIES OF OUR IMAGE OBJECT
     int r, c;
 
     public:
