@@ -10,7 +10,6 @@ using namespace std;
 
 int main(int argc, char** argv) {
 
-    
     if (argc != 2) {
         printf("Usage: ./imgProcess <Image_Path>\n");
         return -1;
