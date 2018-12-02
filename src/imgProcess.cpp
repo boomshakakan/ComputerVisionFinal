@@ -4,13 +4,13 @@
 #include <array>
 #include <string>
 #include <opencv2/opencv.hpp>
-#include <leptonica/allheaders.h>
-#include <tesseract/baseapi.h>
+//#include <leptonica/allheaders.h>
+//#include <tesseract/baseapi.h>
 #include "imgProcess.h"
 
 using namespace cv;
 using namespace std;
-using namespace tesseract;
+//using namespace tesseract;
 
 int main(int argc, char** argv) {
 
