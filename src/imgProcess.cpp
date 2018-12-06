@@ -66,8 +66,15 @@ int main(int argc, char** argv) {
 
     imshow("Binary image", binaryImg);
 
+    // use this to invert the background and foreground
+    bitwise_not(binaryImg, binaryImg);
+
+    imshow("Inverted Colors", binaryImg);
+
     Mat erosionImg = binaryImg.clone();
+    
     int currMin, newC, newR;
+    
     // PERFORM FIRST STAGE OF DILATION AND EROSION
     // START OF EROSION
     for (int a=1; a<binaryImg.cols-1; a++) {
@@ -87,8 +94,31 @@ int main(int argc, char** argv) {
             erosionImg.at<uchar>(b,a) = currMin;
         }
     }
-
+    
     imshow("Image after erosion applied", erosionImg);
+
+    // find all points where white pixels exist
+    vector<Point> points;
+    Mat_<uchar>::iterator iter = erosionImg.begin<uchar>();
+    Mat_<uchar>::iterator end = erosionImg.end<uchar>();
+    // we loop through the image and when we encounter white pixel we push position to vector
+    for (; iter != end; ++iter) {
+        if (*iter) {
+            points.push_back(iter.pos());
+        }
+    }
+
+    // compute the bounding box (rectangle) of text content using our points vector
+    RotatedRect boundingBox = minAreaRect(Mat(points));
+    cout << "Angle of our bounding box: " << boundingBox.angle << endl;
+
+    Mat rotationMatrix = getRotationMatrix2D(boundingBox.center, boundingBox.angle, 1);
+    
+    Mat rotatedImg;
+    // INTER_CUBIC is our interpolation method of choice
+    warpAffine(erosionImg, rotatedImg, rotationMatrix, erosionImg.size(), INTER_CUBIC);
+
+    imshow("Rotated Image", rotatedImg);
 
     Mat dilationImg = erosionImg.clone();
     int currMax;
