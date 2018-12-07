@@ -1,12 +1,12 @@
-#include <opencv2/opencv.hpp>
+
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
 #include <array>
 #include <string>
-
-//#include <leptonica/allheaders.h>
-//#include <tesseract/baseapi.h>
+#include <opencv2/opencv.hpp>
+#include <leptonica/allheaders.h>
+#include <tesseract/baseapi.h>
 #include "imgProcess.h"
 
 using namespace cv;
@@ -32,7 +32,7 @@ int main(int argc, char** argv) {
 
     // convert the rgb image to grayscale
     cvtColor(originalImg, grayImg, CV_RGB2GRAY);
-    imshow("Grayscale Image", grayImg);
+    //imshow("Grayscale Image", grayImg);
 
     Mat binaryImg = grayImg.clone();
     // cout << "ROWS:" << grayImg.rows << endl << "COLS:" << grayImg.cols << endl;
@@ -42,10 +42,10 @@ int main(int argc, char** argv) {
     int threshVal = 200;
     performThresholding(grayImg, binaryImg, threshVal);
 
-    imshow("Binary image", binaryImg);
+    //imshow("Binary image", binaryImg);
     // use this to invert the background and foreground pixels
     bitwise_not(binaryImg, binaryImg);
-    imshow("Inverted Colors", binaryImg);
+    //imshow("Inverted Colors", binaryImg);
 
     // PERFORM FIRST STAGE OF EROSION
     Mat erosionImg = binaryImg.clone();
@@ -56,12 +56,12 @@ int main(int argc, char** argv) {
     Mat dilationImg = erosionImg.clone();
     // pass in the image after erosion, target image and number of iterations
     performDilation(erosionImg, dilationImg, 1);
-    imshow("Image after 1 pass Erosion/Dilation", dilationImg);
+    //imshow("Image after 1 pass Erosion/Dilation", dilationImg);
 
     // find all points where white pixels exist
     vector<Point> points;
-    Mat_<uchar>::iterator iter = erosionImg.begin<uchar>();
-    Mat_<uchar>::iterator end = erosionImg.end<uchar>();
+    Mat_<uchar>::iterator iter = dilationImg.begin<uchar>();
+    Mat_<uchar>::iterator end = dilationImg.end<uchar>();
     // we loop through the image and when we encounter a white pixel we push position to our vector
     for (; iter != end; ++iter) {
         if (*iter) {
@@ -86,7 +86,7 @@ int main(int argc, char** argv) {
     
     Mat rotatedImg;
     // INTER_CUBIC is our selected interpolation method
-    warpAffine(erosionImg, rotatedImg, rotationMatrix, erosionImg.size(), INTER_CUBIC);
+    warpAffine(dilationImg, rotatedImg, rotationMatrix, erosionImg.size(), INTER_CUBIC);
     imshow("Image after Rotation", rotatedImg);
     
     unsigned char selection;
@@ -97,7 +97,7 @@ int main(int argc, char** argv) {
     if (selection == '1') {
         degree = degree + 180;
         rotationMatrix = getRotationMatrix2D(boundingBox.center, degree, 1);
-        warpAffine(erosionImg, rotatedImg, rotationMatrix, erosionImg.size(), INTER_CUBIC);
+        warpAffine(dilationImg, rotatedImg, rotationMatrix, erosionImg.size(), INTER_CUBIC);
         imshow("Corrected image angle", rotatedImg);
     }
     else {
@@ -105,11 +105,17 @@ int main(int argc, char** argv) {
     }
 
     // initialize pointer to instance of TessBaseAPI class
+    string textOutput;
+    string languageChoice = "eng";
 
-    //string textOutput;
+    TessBaseAPI *ocr = new TessBaseAPI();
+    ocr->Init(NULL, languageChoice, OEM_LSTM_ONLY);
+    ocr->SetPageSegMode(PSM_AUTO);
+    ocr->SetImage(rotatedImg.data, rotatedImg.cols, rotatedImg.rows, 3, rotatedImg.step);
 
-    //TessBaseAPI *ocr = new TessBaseAPI();
-    //ocr->Init(NULL, "eng", OEM_LSTM_ONLY);
+    textOutput = string(ocr->GetUTF8Text());
+
+    writeToFile(textOutput);
 
     cout << "Type 'e' to close the program" << endl;
     waitKey(10);
@@ -118,5 +124,6 @@ int main(int argc, char** argv) {
     if (selection == 'e') {
         return 1;
     }
+
     return 0;
 }

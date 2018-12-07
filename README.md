@@ -8,5 +8,7 @@ IMPORTANT NOTE (TO RUN PROJECT IN COMMAND PROMPT):
 4. run "./imgProcess frog.jpeg"
 5. Output should be printed to command line
 
+AT THE MOMENT THIS IS ONLY TESTED AND CONFIGURED TO WORK ON MACOSX
+
 
 

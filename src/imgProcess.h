@@ -4,10 +4,23 @@
 #define imgProcess_VERSION_MINOR @imgProcess_VERSION_MINOR@
 
 #include <cstdio>
+#include <cstdlib>
+#include <string>
 #include <iostream>
 #include <opencv2/opencv.hpp>
 
+using namespace std;
 using namespace cv;
+
+void writeToFile(string results) {
+    ofstream newFile;
+
+    newFile.open ("TesseractResults.txt");
+    newFile << results;
+    newFile.close();
+
+    return;
+}
 
 void performThresholding(Mat grayscaleImg, Mat targetImg, int thresholdVal) {
     for (int a=1; a<grayscaleImg.cols-1; a++) {
@@ -31,6 +44,7 @@ void performThresholding(Mat grayscaleImg, Mat targetImg, int thresholdVal) {
             //cout << pixelValue << endl;
         }
     }
+    return;
 }
 
 void performErosion(Mat binaryImg, Mat targetImg, int stages) {
@@ -55,6 +69,7 @@ void performErosion(Mat binaryImg, Mat targetImg, int stages) {
             }
         }
     }
+    return;
 }
 
 void performDilation(Mat erosionImg, Mat targetImg, int stages) {
@@ -79,6 +94,7 @@ void performDilation(Mat erosionImg, Mat targetImg, int stages) {
             }
         }
     }
+    return;
 }
 
 
