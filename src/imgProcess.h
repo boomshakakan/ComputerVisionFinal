@@ -5,105 +5,81 @@
 
 #include <cstdio>
 #include <iostream>
+#include <opencv2/opencv.hpp>
 
-using namespace std;
+using namespace cv;
 
-class pixel { 
-    private:
-    // an image object (defined below) will contain a 2-D array of pixels (defined here)
-    // pixel will also hold values such as PIXEL INTENSITY, ... ?
-    // VARIABLES
-    int intensity; // range of 0-255
-    int x, y;
-
-    public:
-    // CONSTRUCTORS
-    pixel() {
-        cout << "Default pixel constructor called" << endl;
-        intensity = 0;
+void performThresholding(Mat grayscaleImg, Mat targetImg, int thresholdVal) {
+    for (int a=1; a<grayscaleImg.cols-1; a++) {
+        for (int b=1; b<grayscaleImg.rows-1; b++) {
+            int sum = 0;
+            int avg = 0;
+            // this loop is for finding our 3x3 neighborhood
+            for (int c=-1; c<=1; c++) {
+                for (int d=-1; d<=1; d++) {
+                    sum = sum + (int)grayscaleImg.at<uchar>(b+d,a+c);
+                    avg = sum / 9;
+                }
+            }
+            if (avg > thresholdVal) {
+                targetImg.at<uchar>(b,a) = 255;
+            }
+            else {
+                targetImg.at<uchar>(b,a) = 0;
+            }
+            int pixelValue = (int)targetImg.at<uchar>(b,a);
+            //cout << pixelValue << endl;
+        }
     }
+}
 
-    pixel(int newIntensity) {
-        cout << "Constructor called... intensity set" << endl;
-        intensity = newIntensity;
+void performErosion(Mat binaryImg, Mat targetImg, int stages) {
+    int currMin, newC, newR;
+
+    for (int x=0; x<stages; x++) {
+        for (int a=1; a<binaryImg.cols-1; a++) {
+            for (int b=1; b<binaryImg.rows-1; b++) {
+                currMin = (int)binaryImg.at<uchar>(b,a);
+                // loop to find 3x3 neighborhood of pixel
+                for (int c=a-1; c<=a+1; c++) {
+                    for (int d=b-1; d<=b+1; d++) {
+                        newC = c;
+                        newR = d;
+
+                        if (currMin > (int)binaryImg.at<uchar>(newR,newC)) {
+                            currMin= (int)binaryImg.at<uchar>(newR,newC);
+                        }
+                    }
+                }
+                targetImg.at<uchar>(b,a) = currMin;
+            }
+        }
     }
+}
 
-    pixel(int newIntensity, int c, int r) {
-        cout << "Constructor called... intensity & coordinates set" << endl;
-        intensity = newIntensity;
-        x = c;
-        y = r;
+void performDilation(Mat erosionImg, Mat targetImg, int stages) {
+    int currMax, newC, newR;
+
+    for (int x=0; x<stages; x++) {
+        for (int a=1; a<erosionImg.cols-1; a++) {
+            for (int b=1; b<erosionImg.rows-1; b++) {
+                currMax = (int)erosionImg.at<uchar>(b,a);
+                // loop to find 3x3 neighborhood of pixel
+                for (int c=a-1; c<=a+1; c++) {
+                    for (int d=b-1; d<=b+1; d++) {
+                        newC = c;
+                        newR = d;
+
+                        if (currMax < (int)erosionImg.at<uchar>(newR,newC)) {
+                            currMax = (int)erosionImg.at<uchar>(newR,newC);
+                        }
+                    }
+                }
+                targetImg.at<uchar>(b,a) = currMax;
+            }
+        }
     }
+}
 
-    // destructor for pixel object 
-    ~pixel() {
-        cout << "Destructor called for pixel" << endl;
-        // DESTROY (more important for image object)
-    }
-
-    // MEMBER FUNCTIONS
-    void printIntensity() {
-        cout << intensity << endl;
-    }
-
-    // GETTER AND SETTER FUNCTION FOR OUR PIXEL'S INTENSITY & OUR PIXEL COORDINATES
-    int getIntensity() {
-        return intensity;
-    }
-
-    void setIntensity(int newIntensity) {
-        intensity = newIntensity;
-    }
-
-    int getRow() {
-        return x;
-    }
-
-    int getCol() {
-        return y;
-    }
-
-    void setRow(int newRow) {
-        x = newRow;
-    }
-
-    void setCol(int newCol) {
-        y = newCol;
-    }
-
-    void setCoor(int newRow, int newCol) {
-        x = newRow;
-        y = newCol;
-    }
-};
-
-class image { 
-    private:
-    // This will be populated with our image object -> img[x][y] = our 2-D array of pixels
-    // VARIABLES
-    // an example of how we would create our image object creating an array of pixel objects
-    // THE VARIABLES r & c WILL BE THE BOUNDARIES OF OUR IMAGE OBJECT
-    int r, c;
-
-    public:
-    // CONSTRUCTORS 
-    image() {
-        cout << "Default image constructor called" << endl;
-    }
-
-    image(int x, int y) {
-        cout << "Constructor called with given row and column size" << endl;
-        pixel arr[x][y];
-    }
-    
-    ~image() {
-
-    }
-    // MEMBER FUNCTIONS
-    
-};
-
-// we will use constructors and a nested for loop in order to initialize an array of pixels
-// to give to our image object 
 
 #endif

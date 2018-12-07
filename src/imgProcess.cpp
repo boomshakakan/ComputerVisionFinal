@@ -1,9 +1,10 @@
+#include <opencv2/opencv.hpp>
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
 #include <array>
 #include <string>
-#include <opencv2/opencv.hpp>
+
 //#include <leptonica/allheaders.h>
 //#include <tesseract/baseapi.h>
 #include "imgProcess.h"
@@ -22,86 +23,46 @@ int main(int argc, char** argv) {
     Mat image, originalImg, grayImg;
     // read image sent via the command line in RGB format
     originalImg = imread(argv[1], 1);
-
     imshow("Original Image", originalImg);
 
     if (!originalImg.data) {
         printf("No image data\n");
         return -1;
     }
+
     // convert the rgb image to grayscale
     cvtColor(originalImg, grayImg, CV_RGB2GRAY);
-
     imshow("Grayscale Image", grayImg);
 
-    int threshVal = 200;
-
     Mat binaryImg = grayImg.clone();
-
-    cout << "ROWS:" << grayImg.rows << endl << "COLS:" << grayImg.cols << endl;
-
-    for (int a=1; a<grayImg.cols-1; a++) {
-        for (int b=1; b<grayImg.rows-1; b++) {
-            int sum = 0;
-            int avg = 0;
-            // this loop is for finding our 3x3 neighborhood
-            for (int c=-1; c<=1; c++) {
-                for (int d=-1; d<=1; d++) {
-                    sum = sum + (int)grayImg.at<uchar>(b+d,a+c);
-                    avg = sum / 9;
-                }
-            }
-            // correctly returns the value (0-255) of each pixel
-            
-            if (avg > threshVal) {
-                binaryImg.at<uchar>(b,a) = 255;
-            }
-            else {
-                binaryImg.at<uchar>(b,a) = 0;
-            }
-            int pixelValue = (int)binaryImg.at<uchar>(b,a);
-            //cout << pixelValue << endl;
-        }
-    }
+    // cout << "ROWS:" << grayImg.rows << endl << "COLS:" << grayImg.cols << endl;
+    
+    // we chose not to use openCV functions in order to better understand the implementation
+    // some functions defined in imgProcess.h
+    int threshVal = 200;
+    performThresholding(grayImg, binaryImg, threshVal);
 
     imshow("Binary image", binaryImg);
-
-    // use this to invert the background and foreground
+    // use this to invert the background and foreground pixels
     bitwise_not(binaryImg, binaryImg);
-
     imshow("Inverted Colors", binaryImg);
 
+    // PERFORM FIRST STAGE OF EROSION
     Mat erosionImg = binaryImg.clone();
-    
-    int currMin, newC, newR;
-    
-    // PERFORM FIRST STAGE OF DILATION AND EROSION
-    // START OF EROSION
-    for (int a=1; a<binaryImg.cols-1; a++) {
-        for (int b=1; b<binaryImg.rows-1; b++) {
-            currMin = (int)binaryImg.at<uchar>(b,a);
-            // loop to find 3x3 neighborhood of pixel
-            for (int c=a-1; c<=a+1; c++) {
-                for (int d=b-1; d<=b+1; d++) {
-                    newC = c;
-                    newR = d;
-
-                    if (currMin > (int)binaryImg.at<uchar>(newR,newC)) {
-                        currMin= (int)binaryImg.at<uchar>(newR,newC);
-                    }
-                }
-            }
-            erosionImg.at<uchar>(b,a) = currMin;
-        }
-    }
-    
+    // pass in the binarized image, target image and number of iterations of erosion
+    performErosion(binaryImg, erosionImg, 1);
     imshow("Image after erosion applied", erosionImg);
+
+    Mat dilationImg = erosionImg.clone();
+    // pass in the image after erosion, target image and number of iterations
+    performDilation(erosionImg, dilationImg, 1);
+    imshow("Image after 1 pass Erosion/Dilation", dilationImg);
 
     // find all points where white pixels exist
     vector<Point> points;
     Mat_<uchar>::iterator iter = erosionImg.begin<uchar>();
     Mat_<uchar>::iterator end = erosionImg.end<uchar>();
-    // we loop through the image and when we encounter white pixel we push position to vector
+    // we loop through the image and when we encounter a white pixel we push position to our vector
     for (; iter != end; ++iter) {
         if (*iter) {
             points.push_back(iter.pos());
@@ -110,39 +71,50 @@ int main(int argc, char** argv) {
 
     // compute the bounding box (rectangle) of text content using our points vector
     RotatedRect boundingBox = minAreaRect(Mat(points));
-    cout << "Angle of our bounding box: " << boundingBox.angle << endl;
 
-    Mat rotationMatrix = getRotationMatrix2D(boundingBox.center, boundingBox.angle, 1);
     
-    Mat rotatedImg;
-    // INTER_CUBIC is our interpolation method of choice
-    warpAffine(erosionImg, rotatedImg, rotationMatrix, erosionImg.size(), INTER_CUBIC);
-
-    imshow("Rotated Image", rotatedImg);
-
-    Mat dilationImg = erosionImg.clone();
-    int currMax;
-    // START OF DILATION
-    for (int a=1; a<erosionImg.cols-1; a++) {
-        for (int b=1; b<erosionImg.rows-1; b++) {
-            currMax = (int)erosionImg.at<uchar>(b,a);
-            // loop to find 3x3 neighborhood of pixel
-            for (int c=a-1; c<=a+1; c++) {
-                for (int d=b-1; d<=b+1; d++) {
-                    newC = c;
-                    newR = d;
-
-                    if (currMax < (int)erosionImg.at<uchar>(newR,newC)) {
-                        currMax = (int)erosionImg.at<uchar>(newR,newC);
-                    }
-                }
-            }
-            dilationImg.at<uchar>(b,a) = currMax;
-        }
+    Point2f vertices[4];
+    boundingBox.points(vertices);
+    for (int i=0; i<4; i++) {
+        line(erosionImg, vertices[i], vertices[(i + 1) % 4], Scalar(255, 0, 0), 1, CV_AA);
     }
 
-    // ONE PASS OF EROSION AND DILATION HAS BEEN PERFORMED
-    imshow("Image after 1 pass Erosion/Dilation", dilationImg);
+    imshow("Bounding Box", erosionImg);
+
+    // the problem with our output angle is that we have no reference for its direction
+    // here we correct the angle
+    double degree = boundingBox.angle;
+    if (degree < -45) {
+        degree += 90;
+    }
+
+    unsigned char selection;
+    imshow("Image before Rotation", erosionImg);
+    cout << "Press 1 if the image is inverted (upside-down), Otherwise press 2" << endl;
+    waitKey(10);
+    cin >> selection;
+
+    if (selection == '1') {
+        degree = degree + 180;
+    }
+    else if (selection == '2') {
+        degree = degree + 0;
+    }
+    else {
+        cout << "Not a valid Input, rotation performed without change" << endl;
+    }
+
+
+
+    // THERE ARE SOME OUTLIERS HERE (WHEN CORRECTLY ALIGNED OR UPSIDE DOWN WE GET -90)
+    cout << "Angle of our bounding box: " << degree << endl;
+    // pass into this function some variables defined by the RotatedRect object (center, angle) and a scale factor of 1
+    Mat rotationMatrix = getRotationMatrix2D(boundingBox.center, degree, 1);
+    
+    Mat rotatedImg;
+    // INTER_CUBIC is our selected interpolation method
+    warpAffine(erosionImg, rotatedImg, rotationMatrix, erosionImg.size(), INTER_CUBIC);
+    imshow("Rotated Image", rotatedImg);
 
     // initialize pointer to instance of TessBaseAPI class
 
@@ -151,6 +123,12 @@ int main(int argc, char** argv) {
     //TessBaseAPI *ocr = new TessBaseAPI();
     //ocr->Init(NULL, "eng", OEM_LSTM_ONLY);
 
-    waitKey(0);
+    cout << "Type 'e' to close the program" << endl;
+    waitKey(10);
+    cin >> selection;
+
+    if (selection == 'e') {
+        return 1;
+    }
     return 0;
 }

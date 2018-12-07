@@ -7,6 +7,8 @@
 #IncludeRegexTransform: 
 
 /Users/mattstevenson/Desktop/ComputerVisionFinal/ComputerVisionFinal/src/imgProcess.cpp
+opencv2/opencv.hpp
+-
 cstdio
 -
 cstdlib
@@ -17,8 +19,6 @@ array
 -
 string
 -
-opencv2/opencv.hpp
--
 imgProcess.h
 /Users/mattstevenson/Desktop/ComputerVisionFinal/ComputerVisionFinal/src/imgProcess.h
 
@@ -26,6 +26,8 @@ imgProcess.h
 cstdio
 -
 iostream
+-
+opencv2/opencv.hpp
 -
 
 /usr/local/include/boost/assert.hpp
