@@ -72,39 +72,12 @@ int main(int argc, char** argv) {
     // compute the bounding box (rectangle) of text content using our points vector
     RotatedRect boundingBox = minAreaRect(Mat(points));
 
-    
-    Point2f vertices[4];
-    boundingBox.points(vertices);
-    for (int i=0; i<4; i++) {
-        line(erosionImg, vertices[i], vertices[(i + 1) % 4], Scalar(255, 0, 0), 1, CV_AA);
-    }
-
-    imshow("Bounding Box", erosionImg);
-
     // the problem with our output angle is that we have no reference for its direction
     // here we correct the angle
     double degree = boundingBox.angle;
     if (degree < -45) {
         degree += 90;
     }
-
-    unsigned char selection;
-    imshow("Image before Rotation", erosionImg);
-    cout << "Press 1 if the image is inverted (upside-down), Otherwise press 2" << endl;
-    waitKey(10);
-    cin >> selection;
-
-    if (selection == '1') {
-        degree = degree + 180;
-    }
-    else if (selection == '2') {
-        degree = degree + 0;
-    }
-    else {
-        cout << "Not a valid Input, rotation performed without change" << endl;
-    }
-
-
 
     // THERE ARE SOME OUTLIERS HERE (WHEN CORRECTLY ALIGNED OR UPSIDE DOWN WE GET -90)
     cout << "Angle of our bounding box: " << degree << endl;
@@ -114,7 +87,22 @@ int main(int argc, char** argv) {
     Mat rotatedImg;
     // INTER_CUBIC is our selected interpolation method
     warpAffine(erosionImg, rotatedImg, rotationMatrix, erosionImg.size(), INTER_CUBIC);
-    imshow("Rotated Image", rotatedImg);
+    imshow("Image after Rotation", rotatedImg);
+    
+    unsigned char selection;
+    cout << "Press 1 if the image is inverted (upside-down), Otherwise press 2" << endl;
+    waitKey(10);
+    cin >> selection;
+
+    if (selection == '1') {
+        degree = degree + 180;
+        rotationMatrix = getRotationMatrix2D(boundingBox.center, degree, 1);
+        warpAffine(erosionImg, rotatedImg, rotationMatrix, erosionImg.size(), INTER_CUBIC);
+        imshow("Corrected image angle", rotatedImg);
+    }
+    else {
+        cout << "No changes made to image alignment" << endl;
+    }
 
     // initialize pointer to instance of TessBaseAPI class
 
